@@ -36,11 +36,11 @@ module Pictowiz
     end
 
     get '/images/:id.:ext' do |id, ext|
-      file = "#{settings.images_dir}/#{id}.#{ext}"
-      if File.file?(file)
-        image_data = File.read(file)
-        [200, { 'Content-Type' => { 'jpg' => 'image/jpeg', 'png' => 'image/png' }[ext] }, image_data]
-      else
+      image = Pictowiz::Image.load_file(id: id, image_dir: settings.images_dir)
+      begin
+        image_info = image.in_format(ext)
+        [200, { 'Content-Type' => image_info[1] }, File.read(image_info[0])]
+      rescue Pictowiz::Image::UnsupportedFormatError, Pictowiz::Image::ImageNotFoundError
         404
       end
     end
