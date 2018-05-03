@@ -13,3 +13,6 @@ Naming/HeredocDelimiterNaming:
 
 Metrics/BlockLength:
   Enabled: false
+
+Style/NonNilCheck:
+  Enabled: false

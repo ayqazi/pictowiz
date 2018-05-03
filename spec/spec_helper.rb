@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+IMAGE_DIR = File.expand_path(__dir__ + '/../tmp/test_images/')
 ENV['APP_ENV'] ||= 'test'
 load File.expand_path(__dir__ + '/../lib/bootstrap.rb')
 

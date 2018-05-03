@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'sinatra/base'
+require 'pictowiz/image'
 require 'yaml'
 require 'securerandom'
 require 'mini_magick'
@@ -14,33 +15,30 @@ module Pictowiz
     end
 
     post '/images' do
-      id = SecureRandom.uuid
-      base_url = "#{request.env['rack.url_scheme']}://#{request.host}/images/#{id}"
-      orig_ext = {'image/jpeg' => 'jpg', 'image/png' => 'png'}[request.content_type]
+      image = nil
+      begin
+        image = Pictowiz::Image.new(data: request.body.read,
+                                    content_type: request.content_type,
+                                    image_dir: settings.images_dir)
+      rescue Pictowiz::Image::UnsupportedFormatError
+        next 415
+      end
 
-      next 415 if orig_ext.nil?
+      image.write!
 
+      base_url = "#{request.env['rack.url_scheme']}://#{request.host}/images"
       urls = {}
-
-      orig_file = "#{settings.images_dir}/#{id}.#{orig_ext}"
-      File.write(orig_file, request.body.string, mode: 'wb')
-
-      ['jpg', 'png'].each do |ext|
-        urls["url_#{ext}"] = "#{base_url}.#{ext}"
-        next if ext == orig_ext
-
-        file = "#{settings.images_dir}/#{id}.#{ext}"
-        image = MiniMagick::Image.open(orig_file)
-        image.format(ext)
-        image.write(file)
+      Pictowiz::Image::FORMATS.map do |format|
+        urls["url_#{format}"] = "#{base_url}/#{image.filenames.fetch(format)}"
       end
 
       [201, { 'Content-Type' => 'application/json;charset=utf-8' }, urls.to_json]
     end
 
     get '/images/:id.:ext' do |id, ext|
-      if File.file?("#{settings.images_dir}/#{id}.#{ext}")
-        image_data = File.read("#{settings.images_dir}/#{id}.#{ext}")
+      file = "#{settings.images_dir}/#{id}.#{ext}"
+      if File.file?(file)
+        image_data = File.read(file)
         [200, { 'Content-Type' => { 'jpg' => 'image/jpeg', 'png' => 'image/png' }[ext] }, image_data]
       else
         404
