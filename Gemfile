@@ -3,6 +3,7 @@
 source 'https://rubygems.org/'
 
 gem 'sinatra'
+gem 'mini_magick'
 
 group 'development', 'test' do
   gem 'pry'

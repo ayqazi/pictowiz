@@ -3,6 +3,7 @@
 require 'sinatra/base'
 require 'yaml'
 require 'securerandom'
+require 'mini_magick'
 
 module Pictowiz
   class Application < Sinatra::Base
@@ -15,18 +16,32 @@ module Pictowiz
     post '/images' do
       id = SecureRandom.uuid
       base_url = "#{request.env['rack.url_scheme']}://#{request.host}/images/#{id}"
-      urls = {
-        url_jpg: "#{base_url}.jpg"
-      }
-      File.write("#{settings.images_dir}/#{id}.data", request.body.string, mode: 'wb')
-      File.write("#{settings.images_dir}/#{id}.content-type", request.content_type, mode: 'wb')
+      orig_ext = {'image/jpeg' => 'jpg', 'image/png' => 'png'}[request.content_type]
+
+      next 415 if orig_ext.nil?
+
+      urls = {}
+
+      orig_file = "#{settings.images_dir}/#{id}.#{orig_ext}"
+      File.write(orig_file, request.body.string, mode: 'wb')
+
+      ['jpg', 'png'].each do |ext|
+        urls["url_#{ext}"] = "#{base_url}.#{ext}"
+        next if ext == orig_ext
+
+        file = "#{settings.images_dir}/#{id}.#{ext}"
+        image = MiniMagick::Image.open(orig_file)
+        image.format(ext)
+        image.write(file)
+      end
+
       [201, { 'Content-Type' => 'application/json;charset=utf-8' }, urls.to_json]
     end
 
-    get '/images/:id.jpg' do |id|
-      if File.file?("#{settings.images_dir}/#{id}.data")
-        image_data = File.read("#{settings.images_dir}/#{id}.data")
-        [200, { 'Content-Type' => 'image/jpeg' }, image_data]
+    get '/images/:id.:ext' do |id, ext|
+      if File.file?("#{settings.images_dir}/#{id}.#{ext}")
+        image_data = File.read("#{settings.images_dir}/#{id}.#{ext}")
+        [200, { 'Content-Type' => { 'jpg' => 'image/jpeg', 'png' => 'image/png' }[ext] }, image_data]
       else
         404
       end
