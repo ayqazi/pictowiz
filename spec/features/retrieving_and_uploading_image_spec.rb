@@ -12,6 +12,12 @@ RSpec.describe 'Retrieving and uploading images in Pictowiz:' do
   let!(:app) { Pictowiz::Application }
   let(:jpg_image_data) { File.read(__dir__ + '/../fixtures/images/testimage.jpg') }
 
+  before(:all) do
+    # Using * can be dangerous so delete certain files explicitly
+    Dir.glob(__dir__ + '/../../tmp/test_images/*.data').each { |f| File.unlink(f) }
+    Dir.glob(__dir__ + '/../../tmp/test_images/*.content-type').each { |f| File.unlink(f) }
+  end
+
   context 'uploading an image' do
     context 'in a supported format' do
       before do
@@ -77,7 +83,10 @@ RSpec.describe 'Retrieving and uploading images in Pictowiz:' do
     end
 
     context 'for nonexistent file' do
-      it 'returns 404'
+      it 'returns 404' do
+        get '/images/nonexistent.jpg'
+        expect(last_response.status).to eql 404
+      end
     end
   end
 end

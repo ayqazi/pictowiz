@@ -24,8 +24,12 @@ module Pictowiz
     end
 
     get '/images/:id.jpg' do |id|
-      image_data = File.read("#{settings.images_dir}/#{id}.data")
-      [200, { 'Content-Type' => 'image/jpeg' }, image_data]
+      if File.file?("#{settings.images_dir}/#{id}.data")
+        image_data = File.read("#{settings.images_dir}/#{id}.data")
+        [200, { 'Content-Type' => 'image/jpeg' }, image_data]
+      else
+        404
+      end
     end
   end
 end
