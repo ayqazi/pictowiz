@@ -9,9 +9,8 @@ require 'mini_magick'
 module Pictowiz
   class Application < Sinatra::Base
     configure :development, :production do
-      YAML.load_file(File.expand_path(__dir__ + '../../config/app.yml')).each do |name, value|
-        set name.to_sym, value
-      end
+      loaded_settings = YAML.load_file(__dir__ + '/../../config/app.yml')[ENV.fetch('APP_ENV', 'development')]
+      set :images_dir, File.expand_path(loaded_settings['images_dir'])
     end
 
     post '/images' do
@@ -26,7 +25,7 @@ module Pictowiz
 
       image.write!
 
-      base_url = "#{request.env['rack.url_scheme']}://#{request.host}/images"
+      base_url = "#{request.env['rack.url_scheme']}://#{request.host}:#{request.port}/images"
       urls = {}
       Pictowiz::Image::FORMATS.map do |format|
         urls["url_#{format}"] = "#{base_url}/#{image.filenames.fetch(format)}"

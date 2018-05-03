@@ -36,17 +36,17 @@ RSpec.describe 'Retrieving and uploading images in Pictowiz:' do
 
       it 'returns the image URL' do
         body = JSON.parse(last_response.body)
-        expect(body.fetch('url_jpg')).to match %r{^http://#{last_request.host.gsub('.', '\\.')}/images/(.+)\.jpg}
+        expect(body.fetch('url_jpg')).to match %r{^http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}/images/(.+)\.jpg}
       end
 
       it 'gives it a unique name' do
         body = JSON.parse(last_response.body)
-        matchdata = body.fetch('url_jpg').match(%r{^http://#{last_request.host.gsub('.', '\\.')}/images/(.+)\.jpg})
+        matchdata = body.fetch('url_jpg').match(%r{^http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}/images/(.+)\.jpg})
         name1 = matchdata[1]
 
         post '/images', jpg_image_data, 'CONTENT_TYPE' => 'image/jpeg'
         body = JSON.parse(last_response.body)
-        matchdata = body.fetch('url_jpg').match(%r{^http://#{last_request.host.gsub('.', '\\.')}/images/(.+)\.jpg})
+        matchdata = body.fetch('url_jpg').match(%r{^http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}/images/(.+)\.jpg})
         name2 = matchdata[1]
 
         expect(name1).to_not eql name2
@@ -66,7 +66,7 @@ RSpec.describe 'Retrieving and uploading images in Pictowiz:' do
       let(:url_jpg) do
         post '/images', jpg_image_data, 'CONTENT_TYPE' => 'image/jpeg'
         url = JSON.parse(last_response.body).fetch('url_jpg')
-        url = %r{http://#{last_request.host.gsub('.', '\\.')}(/.+)}.match(url)[1]
+        url = %r{http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}(/.+)}.match(url)[1]
         url
       end
 
@@ -91,7 +91,7 @@ RSpec.describe 'Retrieving and uploading images in Pictowiz:' do
       let(:url_jpg) do
         post '/images', png_image_data, 'CONTENT_TYPE' => 'image/png'
         url = JSON.parse(last_response.body).fetch('url_jpg')
-        url = %r{http://#{last_request.host.gsub('.', '\\.')}(/.+)}.match(url)[1]
+        url = %r{http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}(/.+)}.match(url)[1]
         url
       end
 
