@@ -99,3 +99,11 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 end
+
+require 'pictowiz/application'
+
+Pictowiz::Application.class_eval do
+  configure :test do
+    set :images_dir, File.expand_path(__dir__ + '/../tmp/test_images')
+  end
+end

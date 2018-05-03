@@ -1,0 +1,6 @@
+---
+development:
+  images_dir: 'data/images'
+
+# production:
+#   images_dir: '/var/lib/pictowiz/images'
