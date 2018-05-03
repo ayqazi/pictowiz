@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+load 'lib/bootstrap.rb'
+require 'pictowiz/application'
+
+Pictowiz::Application.run!
