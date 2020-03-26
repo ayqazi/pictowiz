@@ -1,10 +1,19 @@
 # Description
 
-An app for storing, retrieving, and converting images
+An app for storing, retrieving, and converting images.
+
+This prototype takes any image of a type supported by GraphicsMagick
+and converts it to a JPEG and a PNG, returning the URLs for the new
+images.
 
 # Requirements
 
-Must have ImageMagick command line tools installed and available in the path
+Must have GraphicsMagick command line tools installed and available in
+the path, e.g. like this:
+
+```
+apt install graphicsmagick
+```
 
 # Running
 
