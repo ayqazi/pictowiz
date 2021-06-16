@@ -36,20 +36,23 @@ RSpec.describe 'Retrieving and uploading images in Pictowiz:' do
 
       it 'returns the image URL' do
         body = JSON.parse(last_response.body)
-        expect(body.fetch('url_jpg')).to match %r{^http://#{last_request.host.gsub('.',
-                                                                                   '\\.')}:#{last_request.port}/images/(.+)\.jpg}
+        expect(body.fetch('url_jpg')).to match(
+          %r{^http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}/images/(.+)\.jpg}
+        )
       end
 
       it 'gives it a unique name' do
         body = JSON.parse(last_response.body)
-        matchdata = body.fetch('url_jpg').match(%r{^http://#{last_request.host.gsub('.',
-                                                                                    '\\.')}:#{last_request.port}/images/(.+)\.jpg})
+        matchdata = body.fetch('url_jpg').match(
+          %r{^http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}/images/(.+)\.jpg}
+        )
         name1 = matchdata[1]
 
         post '/images', jpg_image_data, 'CONTENT_TYPE' => 'image/jpeg'
         body = JSON.parse(last_response.body)
-        matchdata = body.fetch('url_jpg').match(%r{^http://#{last_request.host.gsub('.',
-                                                                                    '\\.')}:#{last_request.port}/images/(.+)\.jpg})
+        matchdata = body.fetch('url_jpg').match(
+          %r{^http://#{last_request.host.gsub('.', '\\.')}:#{last_request.port}/images/(.+)\.jpg}
+        )
         name2 = matchdata[1]
 
         expect(name1).to_not eql name2
