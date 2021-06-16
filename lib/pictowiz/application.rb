@@ -9,7 +9,7 @@ require 'mini_magick'
 module Pictowiz
   class Application < Sinatra::Base
     configure :development, :production do
-      loaded_settings = YAML.load_file(__dir__ + '/../../config/app.yml')[ENV.fetch('APP_ENV', 'development')]
+      loaded_settings = YAML.load_file("#{__dir__}/../../config/app.yml")[ENV.fetch('APP_ENV', 'development')]
       set :images_dir, File.expand_path(loaded_settings['images_dir'])
     end
 

@@ -5,7 +5,9 @@ require 'securerandom'
 module Pictowiz
   class Image
     class Error < RuntimeError; end
+
     class UnsupportedFormatError < Error; end
+
     class ImageNotFoundError < Error; end
 
     FORMAT_TO_CONTENT_TYPE = { 'jpg' => 'image/jpeg', 'png' => 'image/png' }.freeze
@@ -15,6 +17,7 @@ module Pictowiz
 
     def initialize(data:, content_type:, image_dir:)
       raise UnsupportedFormatError, content_type unless CONTENT_TYPES.include?(content_type)
+
       instantiate(id: SecureRandom.uuid, image_dir: image_dir)
       @original_format = CONTENT_TYPE_TO_FORMAT.fetch(content_type)
       @data = data
@@ -34,6 +37,7 @@ module Pictowiz
 
       FORMATS.each do |format|
         next if format == original_format
+
         file_path = file_paths.fetch(format)
         image = MiniMagick::Image.open(original_file_path)
         image.format(format)
@@ -45,6 +49,7 @@ module Pictowiz
       path = file_paths[format]
       raise UnsupportedFormatError, format if path.nil?
       raise ImageNotFoundError, id unless File.file?(path)
+
       content_type = FORMAT_TO_CONTENT_TYPE.fetch(format)
       [path, content_type]
     end
@@ -56,8 +61,8 @@ module Pictowiz
     def instantiate(id:, image_dir:)
       @id = id
       @image_dir = image_dir
-      @filenames = Hash[FORMATS.map { |ext| [ext, "#{id}.#{ext}"] }]
-      @file_paths = Hash[@filenames.map { |ext, name| [ext, "#{image_dir}/#{name}"] }]
+      @filenames = FORMATS.map { |ext| [ext, "#{id}.#{ext}"] }.to_h
+      @file_paths = @filenames.transform_values { |name| "#{image_dir}/#{name}" }
     end
   end
 end

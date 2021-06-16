@@ -16,8 +16,8 @@ RSpec::Matchers.define :be_a_png do
 end
 
 RSpec.describe Pictowiz::Image do
-  let(:jpg_image_data) { File.read(__dir__ + '/../fixtures/images/testimage.jpg') }
-  let(:png_image_data) { File.read(__dir__ + '/../fixtures/images/testimage.png') }
+  let(:jpg_image_data) { File.read("#{__dir__}/../fixtures/images/testimage.jpg") }
+  let(:png_image_data) { File.read("#{__dir__}/../fixtures/images/testimage.png") }
 
   before(:all) do
     # Using * can be dangerous so delete certain files explicitly
