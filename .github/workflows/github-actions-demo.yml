@@ -9,5 +9,4 @@ jobs:
       - name: docker-build
         run: |
           DOCKER_BUILDKIT=1 docker build --progress=plain --tag pictowiz:latest .
-      - name: print-status
-        run: echo Status: ${{ job.status }}
+      - run: echo Status - ${{ job.status }}
